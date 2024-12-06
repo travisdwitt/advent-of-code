@@ -12,8 +12,8 @@ function isOrdered(report) {
 
 function inRange(report) {
   return report.every((x, i, rep) => {
-    let diff = Math.abs(x - rep[i]);
-    return diff >= 1 && diff <= 3;
+    let diff = Math.abs(x - rep[i - 1]);
+    return i === 0 ? true : diff >= 1 && diff <= 3;
   })
 }
 
