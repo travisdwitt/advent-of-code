@@ -1,5 +1,9 @@
-# Advent of Code Solutions
+# Advent of Code
 
-These are all of my solutions for various years of 'Advent of Code' challenges. Most of this code is bad and all of the years are unfinished because I'm starting this from scratch.
+My attempts at solving [Advent of Code](https://www.adventofcode.com) puzzles.
 
-If you want to try these out yourself you can find all of this year (and past years) [here](https://adventofcode.com).
+I'm mostly using these as a way to teach myself different programming languages
+so there will be a couple of different ones used here (possibly even for the same
+puzzles).
+
+If you find any of these solutions useful feel free to let me know or star the repo.
