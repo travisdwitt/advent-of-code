@@ -4,72 +4,72 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
-	"strings"
 )
 
 func main() {
 
-	grid := make([][]bool, 1000)
-	for i := range grid {
-		grid[i] = make([]bool, 1000)
-	}
-
-	// Open input.txt
-	input, err := os.Open("./input.txt")
+	input, err := os.Open("input.txt")
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println("Error opening file:", err)
 		return
 	}
+	defer input.Close()
 
-	fileScanner := bufio.NewScanner(input)
-	fileScanner.Split(bufio.ScanLines)
+	grid := [1000][1000]int{}
+	reTurnOn := regexp.MustCompile(`^turn on (\d+),(\d+) through (\d+),(\d+)$`)
+	reTurnOff := regexp.MustCompile(`^turn off (\d+),(\d+) through (\d+),(\d+)$`)
+	reToggle := regexp.MustCompile(`^toggle (\d+),(\d+) through (\d+),(\d+)$`)
 
-	for fileScanner.Scan() {
-		line := fileScanner.Text()
-		parts := strings.Fields(line)
+	scanner := bufio.NewScanner(input)
+	for scanner.Scan() {
+		line := scanner.Text()
 
-		// TODO: parse instructions correctly to getRange and the below for loops work
-
-		start := getRange(lightRange)
-		xa, ya := start[0], start[1]
-		xb, yb := start[2], start[3]
-
-		for i := xa; i <= xb; i++ {
-			for j := ya; j <= yb; j++ {
-				switch action {
-				case "toggle":
-					grid[i][j] = !grid[i][j]
-				case "turn on":
-					grid[i][j] = true
-				case "turn off":
-					grid[i][j] = false
+		if matches := reTurnOn.FindStringSubmatch(line); matches != nil {
+			x1, _ := strconv.Atoi(matches[1])
+			y1, _ := strconv.Atoi(matches[2])
+			x2, _ := strconv.Atoi(matches[3])
+			y2, _ := strconv.Atoi(matches[4])
+			// Increase brightness by 1
+			for x := x1; x <= x2; x++ {
+				for y := y1; y <= y2; y++ {
+					grid[x][y]++
+				}
+			}
+		} else if matches := reTurnOff.FindStringSubmatch(line); matches != nil {
+			x1, _ := strconv.Atoi(matches[1])
+			y1, _ := strconv.Atoi(matches[2])
+			x2, _ := strconv.Atoi(matches[3])
+			y2, _ := strconv.Atoi(matches[4])
+			// Decrease brightness by 1, don't allow negative numbers
+			for x := x1; x <= x2; x++ {
+				for y := y1; y <= y2; y++ {
+					if grid[x][y] > 0 {
+						grid[x][y]--
+					}
+				}
+			}
+		} else if matches := reToggle.FindStringSubmatch(line); matches != nil {
+			x1, _ := strconv.Atoi(matches[1])
+			y1, _ := strconv.Atoi(matches[2])
+			x2, _ := strconv.Atoi(matches[3])
+			y2, _ := strconv.Atoi(matches[4])
+			// Increase brightness by 2
+			for x := x1; x <= x2; x++ {
+				for y := y1; y <= y2; y++ {
+					grid[x][y] += 2
 				}
 			}
 		}
 	}
 
-	count := 0
-	for i := range grid {
-		for j := range grid[i] {
-			if grid[i][j] {
-				count++
-			}
+	totalBrightness := 0
+	for i := 0; i < 1000; i++ {
+		for j := 0; j < 1000; j++ {
+			totalBrightness += grid[i][j]
 		}
 	}
 
-	fmt.Println(count)
-
-}
-
-func getRange(input string) [4]int {
-	parsedInput := strings.Split(input, " ")
-	corners := parsedInput[1] + "," + parsedInput[3]
-	values := strings.Split(corners, ",")
-	var result [4]int
-	for i, value := range values {
-		result[i], _ = strconv.Atoi(value)
-	}
-
-	return result
+	fmt.Println(totalBrightness)
 }
